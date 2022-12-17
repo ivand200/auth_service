@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import uvicorn
 
 from routers.users import users_router
 from db import get_database, metadata, sqlalchemy_engine, database
@@ -20,3 +21,7 @@ async def shutdown():
 
 
 app.include_router(users_router, prefix="/users", tags=["users"])
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)

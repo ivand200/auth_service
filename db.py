@@ -8,7 +8,7 @@ from typing import Any, Type
 
 settings: Settings = Settings()
 
-DATABASE_URL: str = str(settings.database_url)
+DATABASE_URL: str = str(settings.database_sqlite)
 database: Any = Database(DATABASE_URL)
 sqlalchemy_engine: Engine = sqlalchemy.create_engine(
     DATABASE_URL
