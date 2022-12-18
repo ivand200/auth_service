@@ -2,7 +2,7 @@ __pycache__
 .mypy_cache/
 .pytest_cache/
 .pytype/
-alembic/__pycache__
+alembic/__pycache__/
 alembic/versions/__pycache__
 models/__pycache__
 routers/__pycache__

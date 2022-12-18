@@ -1,8 +1,6 @@
-# import time
-# pylint: disable = C0115, R0903
 from datetime import datetime, timedelta
 
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr  # type: ignore
 import sqlalchemy
 
 from db import metadata

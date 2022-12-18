@@ -1,17 +1,11 @@
-
-
 .PHONY: typehint
 typehint:
-	mypy --show-error-context --no-strict-optional  $(FILE)
+	pytype $(file)
 
 .PHONY: black
 black:
-	black --check --diff $(FILE)
-
-.PHONY: pylint
-pylint:
-	pylint $(FILE)
+	black --diff $(file)
 
 .PHONY: checklist
-checklist: typehint black pylint
+checklist: typehint black
 

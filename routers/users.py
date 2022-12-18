@@ -11,7 +11,8 @@ from fastapi.security import APIKeyHeader
 from databases import Database
 
 from models.users import (
-    AccessToken, users,
+    AccessToken,
+    users,
     metadata,
     UserBase,
     UserCreate,
@@ -200,7 +201,7 @@ async def password_reset(
     with sending new verification code to the email
     """
     user_db: UserDB
-    user_db= await get_user_by_email(email, database)
+    user_db = await get_user_by_email(email, database)
     code = random.randint(1000, 9999)
     query = """UPDATE users SET verification_code = :code WHERE id = :id"""
     await database.execute(query=query, values={"code": code, "id": user_db.id})

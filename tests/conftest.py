@@ -9,6 +9,7 @@ from password import password_hash, verify_password
 from authentication import authenticate, create_access_token
 from settings import Settings
 
+
 settings = Settings()
 
 

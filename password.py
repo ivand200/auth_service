@@ -6,11 +6,9 @@ import secrets
 from typing import Type
 
 
-CryptContext: Type[passlib.context.CryptContext]
-pwd_context: passlib.context.CryptContext
-
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context: passlib.context.CryptContext = CryptContext(
+    schemes=["bcrypt"], deprecated="auto"
+)
 
 
 def password_hash(password: str) -> str:
