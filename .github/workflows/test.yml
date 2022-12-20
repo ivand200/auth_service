@@ -19,10 +19,10 @@ jobs:
           context: .
           push: false
           tags: |
-            auth_service:latest
+            auth_service:dev
       - name: pytest
         run: |
-          docker run -p 8000:8000 -d auth:latest
+          docker run -p 8000:8000 -d auth:dev
           sleep 30
           pytest
 
