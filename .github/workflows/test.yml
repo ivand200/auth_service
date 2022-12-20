@@ -12,6 +12,7 @@ jobs:
       - name: install dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
       - name: Build and test
         uses: docker/build-push-action@v2
         with:
@@ -21,10 +22,7 @@ jobs:
             auth_service
       - name: pytest
         run: |
-          docker run -d --name postgres -p 5455:5432 -e POSTGRES_USER=postgresUser -e POSTGRES_PASSWORD=postgresPW -e POSTGRES_DB=postgresDB -d postgres
-          sleep 40
-          alembic revision --autogenerate -m 'Initial migration'
-          alembic upgrade head
-          uvicorn main:app
-          pytest -v
+          docker run -p 8000:8000 -d auth 
+          sleep 30
+          pytest
 

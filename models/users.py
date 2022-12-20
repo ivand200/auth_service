@@ -1,12 +1,12 @@
+from typing import Any, Type
 from datetime import datetime, timedelta
-
 from pydantic import BaseModel, Field, EmailStr  # type: ignore
+
 import sqlalchemy
+from sqlalchemy.sql.schema import MetaData
 
 from db import metadata
 from password import generate_token
-from sqlalchemy.sql.schema import MetaData
-from typing import Any, Type
 
 
 def get_expiration_date(duration_seconds: int = 86400) -> datetime:

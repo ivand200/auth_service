@@ -1,8 +1,8 @@
 from typing import Optional, Union
 
 from fastapi import HTTPException, status
-from models.users import AccessToken, access_tokens, users, UserDB
 
+from models.users import AccessToken, access_tokens, users, UserDB
 from password import verify_password
 from db import database
 

@@ -1,9 +1,11 @@
+from typing import Any, Type
+
 import sqlalchemy
-from databases import Database
-from settings import Settings
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.sql.schema import MetaData
-from typing import Any, Type
+
+from databases import Database
+from settings import Settings
 
 
 settings: Settings = Settings()

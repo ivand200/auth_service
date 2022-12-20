@@ -1,13 +1,11 @@
-from typing import Any, Coroutine, Type, Union, List
-from sqlalchemy.sql.schema import MetaData
-
 import logging
-from datetime import datetime
 import random
+from datetime import datetime
+from typing import Any, Coroutine, Type, Union, List
 
+from sqlalchemy.sql.schema import MetaData
 from fastapi import APIRouter, HTTPException, status, Depends, Body
 from fastapi.security import APIKeyHeader
-
 from databases import Database
 
 from models.users import (

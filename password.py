@@ -1,9 +1,9 @@
 import secrets
-from passlib.context import CryptContext
-
-import passlib.context
 import secrets
 from typing import Type
+
+from passlib.context import CryptContext
+import passlib.context
 
 
 pwd_context: passlib.context.CryptContext = CryptContext(

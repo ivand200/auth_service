@@ -1,7 +1,9 @@
 import smtplib
+from typing import Type
+
 from email.message import EmailMessage
 from settings import Settings
-from typing import Type
+
 
 settings: Settings = Settings()
 

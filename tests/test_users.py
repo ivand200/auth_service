@@ -17,8 +17,8 @@ def test_create_a_new_user(user_info, database):
         f"{settings.BACKEND}/users/registration", json=user_info, timeout=10
     )
     r_body = r.json()
-    database.execute("SELECT email FROM users WHERE email = %s", (user_info["email"],))
-    user_db = database.fetchone()
+    cur = database.cursor()
+    user_db = cur.execute("SELECT email FROM users WHERE email = ?", (user_info["email"],)).fetchone()
     assert user_db
     assert r.status_code == 201
     assert r_body["email"] == user_info["email"]
@@ -51,8 +51,8 @@ def test_reg_confirm(database, new_user):
         timeout=5,
     )
     r_body = r.json()
-    database.execute("SELECT verified FROM users WHERE email = %s", (new_user["email"],))
-    user_db = database.fetchone()
+    cur = database.cursor()
+    user_db = cur.execute("SELECT verified FROM users WHERE email = ?", (new_user["email"],)).fetchone()
     assert user_db[0] == 1
     assert r.status_code == 200
     assert r_body["email"] == new_user["email"]
@@ -71,8 +71,8 @@ def test_reg_confirm_wrong_code(database, new_user):
         timeout=5,
     )
     r_body = r.json()
-    database.execute("SELECT verified FROM users WHERE email = %s", (new_user["email"],))
-    user_db = database.fetchone()
+    cur = database.cursor()
+    user_db = cur.execute("SELECT verified FROM users WHERE email = ?", (new_user["email"],)).fetchone()
     assert user_db[0] == 0
     assert "Wrong email or verification code." in r_body["detail"]
     assert r.status_code == 409
@@ -154,8 +154,8 @@ def test_delete_user(user_token, database):
         timeout=5,
     )
     r_body = r.json()
-    database.execute("SELECT email FROM users WHERE email = %s", (user_token["data"]["email"],))
-    user_db = database.fetchone()
+    cur = database.cursor()
+    user_db = cur.execute("SELECT email FROM users WHERE email = ?", (user_token["data"]["email"],)).fetchone()
     assert user_db is None
     assert r_body["deleted"]
     assert r.status_code == 200
@@ -179,11 +179,23 @@ def test_users_create(username, email, password, database):
     """
     payload = {"username": username, "email": email, "password": password}
     r = requests.post(f"{settings.BACKEND}/users/registration", json=payload, timeout=5)
-    assert r.status_code == 201
-    database.execute("SELECT email, verified FROM users WHERE email = %s", (email,))
-    user_db = database.fetchone()
+    cur = database.cursor()
+    user_db = cur.execute("SELECT email, verified FROM users WHERE email = ?", (email,)).fetchone()
     assert user_db[1] == 0
-    database.execute("DELETE FROM users WHERE email = %s", (email,))
+    assert r.status_code == 201
+    cur.execute("DELETE FROM users WHERE email = ?", (email,))
+    database.commit()
+
+
+# def test_many_user_in_db(clear_database, database):
+#     """
+#     GIVEN registration 5 users
+#     WHEN POST "/users/registration"
+#     THEN check status_code == 201, 5 users in database
+#     """
+#     cur = database.cursor()
+#     users = cur.execute("SELECT * FROM users").fetchall()
+#     print(users)
 
 
 def test_user_password_reset(confirmed_user, database):
@@ -192,16 +204,15 @@ def test_user_password_reset(confirmed_user, database):
     WHEN POST "/server/password-reset"
     THEN check status_code == 200, changing verification_code
     """
-    database.execute("SELECT email, verification_code FROM users WHERE email = %s", (confirmed_user["email"],))
-    user_db = database.fetchone()
+    cur = database.cursor()
+    user_db = cur.execute("SELECT email, verification_code FROM users WHERE email = ?", (confirmed_user["email"],)).fetchone()
     r = requests.post(
         f"{settings.BACKEND}/users/password-reset",
         json={"email": confirmed_user["email"]},
         timeout=5,
     )
     r_body = r.json()
-    database.execute("SELECT email, verification_code FROM users WHERE email = %s", (confirmed_user["email"],))
-    user_refresh = database.fetchone()
+    user_refresh = cur.execute("SELECT email, verification_code FROM users WHERE email = ?", (confirmed_user["email"],)).fetchone()
     assert user_db[1] != user_refresh[1]
     assert r.status_code == 200
     assert confirmed_user["email"] in r_body
