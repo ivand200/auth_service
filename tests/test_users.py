@@ -249,9 +249,8 @@ def test_password_reset_confirm(confirmed_user, database):
         timeout=5,
     )
     r_body = r.json()
-    database.execute("SELECT password FROM users WHERE email = %s", (payload["email"],))
-    user_db_password =database.fetchone()
-    password_check = verify_password(payload["password"], user_db_password[0])
+    password = database.execute("SELECT password FROM users WHERE email = ?", (payload["email"],)).fetchone()
+    password_check = verify_password(payload["password"], password[0])
     assert password_check is True
     assert r_body["password"] == "updated"
     assert r.status_code == 200
