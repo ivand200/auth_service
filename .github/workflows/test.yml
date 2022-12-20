@@ -23,7 +23,7 @@ jobs:
             auth_service:dev
       - name: pytest
         run: |
-          docker run -p 8000:8000 -d auth:dev
+          docker run -p 8000:8000 -d auth_service:dev
           sleep 30
           pytest
 
