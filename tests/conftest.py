@@ -32,7 +32,7 @@ def backend():
 def database():
     con = sqlite3.connect("users.db")
     cur = con.cursor()
-    cur.execute("DELETE FROM access_token")
+    cur.execute("DELETE FROM access_tokens")
     cur.execute("DELETE FROM users")
     con.commit()
     yield con
