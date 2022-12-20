@@ -31,7 +31,7 @@ def backend():
 @pytest.fixture(scope="session")
 def database():
     con = sqlite3.connect("users.db")
-    cur = database.cursor()
+    cur = con.cursor()
     cur.execute("DELETE FROM access_token")
     cur.execute("DELETE FROM users")
     con.commit()
