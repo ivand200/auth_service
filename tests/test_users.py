@@ -178,7 +178,7 @@ def test_users_create(username, email, password, database):
     THEN check status_code == 201, user in database and with not verified status
     """
     payload = {"username": username, "email": email, "password": password}
-    r = requests.post(f"{settings.BACKEND}/users/registration", json=payload, timeout=5)
+    r = requests.post(f"{settings.BACKEND}/users/registration", json=payload, timeout=10)
     cur = database.cursor()
     user_db = cur.execute("SELECT email, verified FROM users WHERE email = ?", (email,)).fetchone()
     assert user_db[1] == 0
