@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -22,9 +23,14 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-# from db import DATABASE_URL, metadata
+from db import DATABASE_URL, metadata, TEST_DATABASE_URL
 # from models.users import users
-# config.set_main_option('sqlalchemy.url', str(DATABASE_URL))
+TESTING = os.getenv("TEST")
+if TESTING == "test":
+    config.set_main_option('sqlalchemy.url', str(TEST_DATABASE_URL))
+else:
+    config.set_main_option('sqlalchemy.url', str(DATABASE_URL))
+
 target_metadata = metadata
 
 # other values from the config, defined by the needs of env.py,

@@ -1,3 +1,4 @@
+import os
 from typing import Any, Type
 
 import sqlalchemy
@@ -10,14 +11,28 @@ from settings import Settings
 
 settings: Settings = Settings()
 
+
+TESTING = os.getenv("TEST")
+
+TEST_DATABASE_URL: str = str(settings.database_test)
 DATABASE_URL: str = str(settings.database_sqlite)
-database: Any = Database(DATABASE_URL)
-sqlalchemy_engine: Engine = sqlalchemy.create_engine(
-    DATABASE_URL
-)  # connect_args={"check_same_thread": False}
+
+if TESTING == "test":
+    print("TEST")
+    database: Any = Database(TEST_DATABASE_URL)
+    sqlalchemy_engine: Engine = sqlalchemy.create_engine(
+        TEST_DATABASE_URL,
+    )  # connect_args={"check_same_thread": False}
+else:
+    database: Any = Database(DATABASE_URL)
+    sqlalchemy_engine: Engine = sqlalchemy.create_engine(
+        DATABASE_URL
+    )  # connect_args={"check_same_thread": False}
+
 
 metadata: MetaData = sqlalchemy.MetaData()
 metadata.create_all(sqlalchemy_engine)
+
 
 # Dependency
 def get_database() -> Database:
