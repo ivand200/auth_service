@@ -1,10 +1,9 @@
+import os
 import random
-import asyncio
 import sqlite3
 
 import pytest
 import requests
-import psycopg2
 
 from password import password_hash, verify_password
 from authentication import authenticate, create_access_token
@@ -14,27 +13,23 @@ from settings import Settings
 settings = Settings()
 
 
+TESTING = os.getenv("TEST")
+if TESTING == "test":
+    database_path = "test_users.db"
+else:
+    database_path = "users.db"
+
+
+
 @pytest.fixture(scope="session")
 def backend():
     return "http://0.0.0.0:8000"
 
 
-# "dbname=postgresDB user=postgresUser host=localhost port=5455 password=postgresPW"
-# @pytest.fixture(scope="session")
-# def database():
-#     conn = psycopg2.connect("dbname=postgresDB user=postgresUser host=0.0.0.0 port=5432 password=postgresPW")
-#     conn.autocommit=True
-#     cur = conn.cursor()
-#     yield cur
-#     conn.close()
-
 @pytest.fixture(scope="session")
 def database():
-    con = sqlite3.connect("users.db")
-    cur = con.cursor()
-    cur.execute("DELETE FROM access_tokens")
-    cur.execute("DELETE FROM users")
-    con.commit()
+    # con = sqlite3.connect(database_path)
+    con = sqlite3.connect("test_users.db")
     yield con
     con.close()
 
@@ -50,8 +45,6 @@ def user_info(database):
     cur = database.cursor()
     cur.execute("DELETE FROM users WHERE email = ?", (data["email"],))
     database.commit()
-
-    # database.execute("DELETE FROM users WHERE email = %s", (data["email"],))
 
 
 @pytest.fixture(scope="function")

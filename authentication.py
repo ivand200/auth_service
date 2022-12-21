@@ -7,12 +7,13 @@ from password import verify_password
 from db import database
 
 
-async def authenticate(email: str, password: str) -> Union[UserDB, bool]:
-    try:
-        query = "SELECT * FROM users WHERE email = :email"
-        user = await database.fetch_one(query=query, values={"email": email})
-    except:
-        return False
+async def authenticate(email: str, password: str) -> UserDB:
+    query = "SELECT * FROM users WHERE email = :email"
+    user = await database.fetch_one(query=query, values={"email": email})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Can't find account."
+    )
     if not user.verified:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="Unverified account."
