@@ -1,5 +1,8 @@
 name: Test
 
+env:
+    TEST: 'test'
+
 on:
   push:
     branches: [TEST]
@@ -7,8 +10,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-        TEST: 'test'
     steps:
       - uses: actions/checkout@v3
       - name: install dependencies
@@ -17,21 +18,5 @@ jobs:
           python -m pip install -r requirements.txt
       - name: test
         run: |
-          gunicorn -D -b 121.0.0.1:8000 -w 4 -k uvicorn.workers.UvicornWorker main:app
+          gunicorn -D -b 127.0.0.1:8000 -w 4 -k uvicorn.workers.UvicornWorker main:app
           pytest tests/test_users.py
-          
-      # - name: Build and test
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     file: ./Dockerfile
-      #     push: false
-      #     tags: |
-      #       auth_service:dev
-      # - name: pytest
-      #   run: |
-      #     alembic init alembic
-      #     docker run -p 8000:8000 -d auth_service:dev
-      #     sleep 30
-      #     pytest
-
