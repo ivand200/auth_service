@@ -1,6 +1,7 @@
 import logging
 import random
 from datetime import datetime
+import logging
 from typing import Any, Coroutine, Type, Union, List
 
 from sqlalchemy.sql.schema import MetaData
@@ -24,9 +25,11 @@ from db import get_database
 from password import password_hash, verify_password
 from authentication import authenticate, create_access_token
 from email_service import email_service
+from send import rabbit_queue
 
 users_router: Any = APIRouter()
 api_key_header: Any = APIKeyHeader(name="Authorization")
+logging.basicConfig(level=logging.INFO)
 
 
 async def get_current_user(
@@ -77,6 +80,7 @@ async def register(
     Register a new user
     email, pasword, username
     """
+    logging.info("User signup | email: %s", user.email)
     query = "SELECT * FROM users WHERE email = :email"
     result = await database.fetch_one(query=query, values={"email": user.email})
     if result:
@@ -103,6 +107,7 @@ async def register(
     refresh_user = await database.fetch_one(
         query=refresh_query, values={"email": user.email}
     )
+    logging.info("New user | email: %s, code: %s", user.email, verification_code)
     return refresh_user
 
 
@@ -113,6 +118,7 @@ async def registration_confirmation(
     """
     Email confirmation with verification code, email
     """
+    logging.info("Email confirmation | email: %s", email_confirm.email)
     query = """SELECT * FROM users WHERE email = :email"""
     user_db = await database.fetch_one(
         query=query, values={"email": email_confirm.email}
@@ -140,6 +146,7 @@ async def create_token(
     User login
     returns access_token, token_type
     """
+    logging.info("User login | email: %s", user.email)
     email = user.email
     password = user.password
     user_db = await authenticate(email, password)
@@ -186,6 +193,7 @@ async def user_delete(
     await database.execute(query=query, values={"id": user.id})
     query = """DELETE FROM users WHERE id = :id"""
     await database.execute(query=query, values={"id": user.id})
+    rabbit_queue({"deleted": user.id})
     return {"deleted": user.id}
 
 

@@ -18,5 +18,7 @@ jobs:
           python -m pip install -r requirements.txt
       - name: test
         run: |
+          docker run -d -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management
+          sleep 30
           gunicorn -D -b 127.0.0.1:8000 -w 4 -k uvicorn.workers.UvicornWorker main:app
           pytest tests/test_users.py

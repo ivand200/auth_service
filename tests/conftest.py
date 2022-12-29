@@ -7,18 +7,17 @@ import requests
 
 from password import password_hash, verify_password
 from authentication import authenticate, create_access_token
-from settings import Settings
+from settings import Settings  # type: ignore
 
 
-settings = Settings()
+settings: Settings = Settings()
 
 
-TESTING = os.getenv("TEST")
-if TESTING == "test":
-    database_path = "test_users.db"
-else:
-    database_path = "users.db"
-
+# TESTING = os.getenv("TEST")
+# if TESTING == "test":
+#     database_path = "test_users.db"
+# else:
+#     database_path = "users.db"
 
 
 @pytest.fixture(scope="session")
@@ -31,6 +30,10 @@ def database():
     # con = sqlite3.connect(database_path)
     con = sqlite3.connect("test_users.db")
     yield con
+    cur = con.cursor()
+    cur.execute("DELETE FROM access_tokens")
+    cur.execute("DELETE FROM users")
+    con.commit()
     con.close()
 
 
@@ -105,11 +108,13 @@ def confirmed_user(database):
             data["verified"],
             data["verification_code"],
             data["is_admin"],
-        )
+        ),
     )
     database.commit()
     yield data
-    user_id = cur.execute("SELECT id FROM users WHERE email = ?", (data["email"],)).fetchone()
+    user_id = cur.execute(
+        "SELECT id FROM users WHERE email = ?", (data["email"],)
+    ).fetchone()
     cur.execute("DELETE FROM access_tokens WHERE user_id = ?", (user_id[0],))
     cur.execute("DELETE FROM users WHERE email = ?", (data["email"],))
     database.commit()
@@ -145,34 +150,15 @@ def user_token(database):
     database.commit()
     raw_token = requests.post(
         f"{settings.BACKEND}/users/login",
-        json={"email": data["email"],"password": "password"},
+        json={"email": data["email"], "password": "password"},
     )
     yield {"token": raw_token.json()["access_token"], "data": data}
-    user_id = cur.execute("SELECT id FROM users WHERE email = ?", (data["email"],)).fetchone()
+    user_id = cur.execute(
+        "SELECT id FROM users WHERE email = ?", (data["email"],)
+    ).fetchone()
     try:
         cur.execute("DELETE FROM access_tokens WHERE user_id = ?", (user_id[0],))
         cur.execute("DELETE FROM users WHERE email = ?", (data["email"],))
         database.commit()
     except:
         pass
-
-
-# @pytest.mark.parametrize(
-#     "username,  email, password",
-#     [
-#         ("test_user_1", "test_1@gmail.com", "user_1@pa55"),
-#         ("test_user_2", "test_2@gmail.com", "user_2@pa55"),
-#         ("test_user_3", "test_3@gmail.com", "user_3@pa55"),
-#         ("test_user_4", "test_4@gmail.com", "user_4@pa55"),
-#         ("test_user_5", "test_5@gmail.com", "user_5@pa55"),
-#     ],
-# )
-# @pytest.fixture(scope="function")
-# def clear_database(database, username, email, password,):
-#     payload = {"username": username, "email": email, "password": password}
-#     r = requests.post(f"{settings.BACKEND}/users/registration", json=payload, timeout=5)
-#     yield True
-#     cur = database.curosr()
-#     cur.execute("DELETE FROM access_tokens")
-#     cur.execute("DELETE FROM users")
-#     database.commit()

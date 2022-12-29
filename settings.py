@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     email_code: str
     BACKEND: str
     TEST: str
+    Rabbit_host: str
+    Rabbit_chanel: str
 
     class Config:
         env_file = ".env"
