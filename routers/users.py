@@ -107,7 +107,7 @@ async def register(
     refresh_user = await database.fetch_one(
         query=refresh_query, values={"email": user.email}
     )
-    loging.info("New user | email: %s, code: %s", user.email, verification_code)
+    logging.info("New user | email: %s, code: %s", user.email, verification_code)
     return refresh_user
 
 

@@ -31,6 +31,10 @@ def database():
     # con = sqlite3.connect(database_path)
     con = sqlite3.connect("test_users.db")
     yield con
+    cur = con.cursor()
+    cur.execute("DELETE FROM access_tokens")
+    cur.execute("DELETE FROM users")
+    con.commit()
     con.close()
 
 
