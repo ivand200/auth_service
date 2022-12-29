@@ -10,7 +10,7 @@ from authentication import authenticate, create_access_token
 from settings import Settings  # type: ignore
 
 
-settings: Any = Settings()
+settings: Settings = Settings()
 
 
 # TESTING = os.getenv("TEST")
